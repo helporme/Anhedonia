@@ -1,0 +1,26 @@
+Goal:
+   ecs
+   multiplatform
+   xml/css/rust UI
+   all crates have two levels (or more), "base" and "ecs", "ecs" version built on top of the "base"
+   editor = first project on engine
+
+   major target: inf-open-world multiplayer game
+   minor target: ability to support an easy indie game
+
+
+Steps:
+  -- You are here --
+  1. Create simple rendering poc 
+  2. Create a render package that support at least .obj file
+  3. Explore ECS packages
+  4. Create simple ecs poc that will be used with rendering
+  5. Create a simple ECS package
+  6. Rewrite a render package with two levels, base and ecs
+  7. Create UI package poc with planes over the screen and improve ECS package
+  8. Try to add text on a plane
+  9. Create flex-table UI and still imrpove ECS package
+  10. Create a funny game with cube and button. When you press button cube rotates! Fun! Yey!
+  
+  -- Iteration0 ends --
+  0. Think what to do further
