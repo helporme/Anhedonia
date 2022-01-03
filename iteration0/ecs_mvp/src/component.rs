@@ -5,7 +5,7 @@ use std::{
 };
 
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 pub struct ComponentType {
     id: TypeId,
     size: usize,
@@ -40,6 +40,25 @@ impl ComponentType {
     }
 }
 
+impl PartialEq for ComponentType {
+    fn eq(&self, other: &Self) -> bool {
+        self.id.eq(other.id())
+    }
+}
+
+impl Eq for ComponentType {}
+
+impl PartialOrd for ComponentType {
+    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+        self.id.partial_cmp(other.id())
+    }
+}
+
+impl Ord for ComponentType {
+    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
+        self.id.cmp(other.id())
+    }
+}
 
 pub trait Component: 'static + Sized + Send + Sync {}
 
