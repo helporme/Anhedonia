@@ -10,6 +10,7 @@ pub struct Entity {
 
 impl Entity {
     pub fn new() -> Self {
+        // Auto id must be removed
         Self {
             id: LAST_ENTITY_ID.fetch_add(1, Ordering::Relaxed)
         }
