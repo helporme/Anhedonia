@@ -159,7 +159,7 @@ impl<'a> ArchetypeChunk<'a> {
         let component_slice = &self.component_slices[*component_idx];
         unsafe { component_slice.read::<T>(entity_idx) }
     }
-        
+
     pub fn read_component_mut<T: Component>(&mut self, entity_idx: usize) -> &mut T {
         debug_assert!(entity_idx < self.entities.len(), "Invalid entity index (not id): {}/{}",
             entity_idx, self.entities.len());
@@ -169,6 +169,26 @@ impl<'a> ArchetypeChunk<'a> {
         unsafe { component_slice.read_mut::<T>(entity_idx) }
     }
 
+    pub fn components<T: Component>(&self) -> &[T] {
+        let component = ComponentType::of::<T>();
+        let component_idx = self.layout.component_index(&component).unwrap();
+        let component_slice = &self.component_slices[*component_idx];
+        
+        unsafe {
+            component_slice.as_slice::<T>(self.layout.chunk_capacity() * component.size())
+        }
+    }
+
+    pub fn components_mut<T: Component>(&mut self) -> &mut [T] {
+        let component = ComponentType::of::<T>();
+        let component_idx = self.layout.component_index(&component).unwrap();
+        let component_slice = &mut self.component_slices[*component_idx];
+        
+        unsafe {
+            component_slice.read_slice_mut::<T>(0, component.size() * self.layout.chunk_capacity())
+        }
+    }
+        
     pub fn print_component_slice<T: Component>(&self) {
         let component = ComponentType::of::<T>();
         let component_idx = self.layout.component_index(&component).unwrap();
@@ -225,5 +245,15 @@ impl ComponentSlice {
         let offset = idx * size_of::<T>();
         let component_ptr = self.ptr.add(offset) as *mut T;
         std::slice::from_raw_parts_mut(component_ptr, len)
+    }
+
+    pub unsafe fn as_slice<T: Component>(&self, len: usize) -> &[T] {
+        let component_ptr = self.ptr as *const T;
+        std::slice::from_raw_parts(component_ptr, len * size_of::<T>())
+    }
+
+    pub unsafe fn as_slice_mut<T: Component>(&mut self, len: usize) -> &mut [T] {
+        let component_ptr = self.ptr as *mut T;
+        std::slice::from_raw_parts_mut(component_ptr, len * size_of::<T>())
     }
 }
