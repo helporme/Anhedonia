@@ -1,12 +1,16 @@
+#![feature(generic_associated_types)] // clion please stop cyberbullying me
+
 pub mod system;
 pub mod node;
 pub mod graph;
 pub mod resource;
 pub mod dependency;
 
-pub mod common;
+pub use prelude::*;
 
-// pub use crate::node::*;
-// pub use crate::function_node::*;
-// pub use crate::graph::*;
-// pub use crate::resource::*;
+pub mod prelude {
+    pub use crate::system::*;
+    pub use crate::node::{Node, StraightNode};
+    pub use crate::graph::Graph;
+    pub use crate::resource::{Resource, ResourceId, Link, copied::Copied};
+}
