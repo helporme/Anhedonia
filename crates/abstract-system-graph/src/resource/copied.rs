@@ -1,7 +1,7 @@
 use crate::dependency::Dependency;
 use crate::resource::*;
 
-/// [`ResourceAccess`] that provides access to a resource by copying it.
+/// [`Link`] that provides access to a resource by copying it.
 #[derive(Copy, Clone)]
 pub struct Copied<R: Resource + Copy>(R);
 

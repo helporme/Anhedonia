@@ -1,6 +1,7 @@
 use std::any::TypeId;
 use std::collections::HashSet;
 
+// todo: doc
 #[derive(Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub struct Dependency {
     id: DependencyId,

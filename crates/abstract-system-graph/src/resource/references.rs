@@ -1,9 +1,7 @@
-/// Implementation of [`ResourceAccess`] for [`Resource`]'s references.
-
 use crate::dependency::Dependency;
 use crate::resource::*;
 
-/// Implements [`ResourceAccess`] to the [`Resource`] reference.
+/// Implements [`Link`] to the [`Resource`] reference.
 impl<R: Resource> Link for &R {
     type Resource = R;
 
@@ -22,7 +20,7 @@ impl<'a, R: Resource, Linker: ResourceLinker<'a>> LinkSupport<'a, &'a R> for Lin
     }
 }
 
-/// Implements [`ResourceAccess`] to the [`Resource`] mutable reference.
+/// Implements [`Link`] to the [`Resource`] mutable reference.
 impl<R: Resource> Link for &mut R {
     type Resource = R;
 

@@ -27,7 +27,20 @@ impl Parse for ImplWithIdents {
     }
 }
 
-
+/// Call macro with given ident repeated from `start` to `end` times.
+///
+/// # Example:
+/// ```rust
+/// use macros::impl_with_idents;
+///
+/// // This
+/// impl_with_idents!(my_macro, T, 0, 3);
+///
+/// // will be converted to the
+/// my_macro!();
+/// my_macro!(T0);
+/// my_macro!(T0, T1);
+/// ```
 #[proc_macro]
 pub fn impl_with_idents(input: TokenStream) -> TokenStream {
     let input = parse_macro_input!(input as ImplWithIdents);
