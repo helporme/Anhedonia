@@ -10,7 +10,7 @@ pub use prelude::*;
 
 pub mod prelude {
     pub use crate::system::*;
-    pub use crate::node::{Node, StraightNode};
+    pub use crate::resource::*;
+    // pub use crate::node::{Node, StraightNode};
     pub use crate::graph::Graph;
-    pub use crate::resource::{Resource, ResourceId, Link, copied::Copied};
 }

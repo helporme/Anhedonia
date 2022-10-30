@@ -94,4 +94,4 @@ macro_rules! impl_system_fn {
 }
 
 // Invoke macro for all parameter sets with a length of 0 to 16.
-impl_with_idents!(impl_system_fn, Link , 0, 16);
+impl_with_idents!(impl_system_fn, L, 0, 16);

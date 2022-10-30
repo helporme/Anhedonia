@@ -1,57 +1,32 @@
-pub mod tuples;
-pub mod references;
-pub mod copied;
-
-pub use copied::*;
-pub use references::*;
-pub use tuples::*;
-
-use std::any::TypeId;
-use std::hash::Hash;
+pub mod auto_impls;
+pub mod any;
 
 use crate::dependency::DependencyWriter;
 
-/// Trait used to describe a resource type.
-pub trait Resource: 'static {}
-
-impl<T: 'static> Resource for T {}
-
-/// Global and unique identifier of resource.
-#[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Debug, Hash)]
-pub struct ResourceId(TypeId);
-
-impl ResourceId {
-    /// Get [`ResourceId`] from any [`Resource`] type.
-    ///
-    /// # Examples:
-    /// ```rust
-    /// use abstract_system_graph::resource::{Resource, ResourceId};
-    ///
-    /// struct MyResource();
-    /// impl Resource for MyResource { }
-    ///
-    /// let id = ResourceId::of::<MyResource>();
-    /// ```
-    #[inline]
-    pub fn of<R: Resource>() -> Self {
-        Self(TypeId::of::<R>())
-    }
+// todo: doc
+pub trait Link {
+    fn write_deps(writer: &mut DependencyWriter);
 }
 
-/// Trait used to describe the ability to access a resource, such as reference.
-pub trait Link: Sized {
-    type Resource: Resource;
-
-    fn write_dependencies(writer: &mut DependencyWriter);
+// todo: doc
+// Established once per node
+pub trait Channel<'a, Link> {
+    fn obtain(&'a self) -> Option<Link>;
+    fn is_alive(&self) -> bool;
 }
 
-pub trait ResourceLinker<'a> {
-    fn acquire_ref<R: Resource>(&self) -> Option<&'a R>;
-    fn acquire_mut<R: Resource>(&self) -> Option<&'a mut R>; // todo: & -> &mut
-    fn has<R: Resource>(&self) -> bool;
+// todo: doc
+pub trait ChannelEstablisher<'a, Channel> {
+    fn configure(&mut self);
+    fn establish(&'a self) -> Option<Channel>;
 }
 
-pub trait LinkSupport<'a, L: Link>: ResourceLinker<'a> {
-    fn acquire_link(&self) -> Option<L>;
-    fn has_link(&self) -> bool;
+pub trait GetChannelEstablisherRef<'a, Channel> {
+    type Output: ChannelEstablisher<'a, Channel>;
+
+    fn channel_establisher(&self) -> &Self::Output;
+}
+
+pub trait GetChannelEstablisherMut<'a, Channel>: GetChannelEstablisherRef<'a, Channel> {
+    fn channel_establisher(&mut self) -> &mut Self::Output;
 }
