@@ -5,7 +5,7 @@ pub mod storage;
 pub mod channels;
 
 pub use links::{Lock, Ref, Mut};
-pub use storage::{AnyStorage, AnyStorageStatic};
+pub use storage::AnyStorage;
 pub use channels::LockChannel;
 
 pub trait AnyResource: 'static + Default { }

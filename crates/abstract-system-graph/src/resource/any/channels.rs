@@ -43,9 +43,7 @@ impl<'a, R: AnyResource> Channel<'a, Mut<'a, R>> for LockChannel<'a, R> {
     }
 }
 
-impl<'a, R, Storage> ChannelEstablisher<'a, LockChannel<'a, R>> for Storage
-    where R: AnyResource, Storage: AnyStorage {
-
+impl<'a, R: AnyResource> ChannelEstablisher<'a, LockChannel<'a, R>> for AnyStorage {
     fn configure(&mut self) {
         self.ensure_lock::<R>()
     }
