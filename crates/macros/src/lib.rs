@@ -50,7 +50,7 @@ pub fn impl_with_idents(input: TokenStream) -> TokenStream {
         .collect::<Vec<_>>();
 
     let macro_ident = &input.macro_ident;
-    let invocations = (input.start..input.end+1).map(|i| {
+    let invocations = (input.start..input.end).map(|i| {
         let custom_idents = &custom_idents[0..i];
         quote! {
             #macro_ident!(#(#custom_idents),*);

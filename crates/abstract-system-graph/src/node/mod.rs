@@ -1,29 +1,37 @@
-pub mod straight;
+pub mod sorting;
+pub mod builtin;
 
-pub use straight::StraightNode;
+pub use builtin::*;
 
 use std::collections::HashSet;
+
 use crate::dependency::Dependency;
 
-// todo: doc
-pub trait Node<'a, ExecutionKit>: 'a {
-    fn configure(&'a self, kit: &mut ExecutionKit);
-    fn initialize(&'a mut self, kit: &'a ExecutionKit);
-    fn execute(&'a self);
+pub trait Node<'a, Kit>: 'a {
+    fn configure(&'a self, kit: &mut Kit);
+    fn build(&'a mut self, kit: &'a Kit);
+    fn execute(&'a self, kit: &'a Kit);
 }
 
-// todo: doc
-pub struct NodePacked<'a, Context> {
-    node: Box<dyn Node<'a, Context>>,
+pub struct NodePacked<'a, Kit> {
+    node: Box<dyn Node<'a, Kit>>,
     dependencies: HashSet<Dependency>,
 }
 
-impl<'a, Context> NodePacked<'a, Context> {
-    pub fn new<N: Node<'a, Context>>(node: N, dependencies: HashSet<Dependency>) -> Self {
+impl<'a, Kit> NodePacked<'a, Kit> {
+    pub fn new<N: Node<'a, Kit>>(node: N, dependencies: HashSet<Dependency>) -> Self {
         Self { node: Box::new(node), dependencies }
     }
 
-    pub fn inner(&'a mut self) -> &dyn Node<Context> {
+    pub fn inner_ref(&'a self) -> &dyn Node<Kit> {
         self.node.as_ref()
+    }
+
+    pub fn inner_mut(&'a mut self) -> &mut dyn Node<Kit> {
+        self.node.as_mut()
+    }
+
+    pub const fn dependencies(&self) -> &HashSet<Dependency> {
+        &self.dependencies
     }
 }

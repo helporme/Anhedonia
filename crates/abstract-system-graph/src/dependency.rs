@@ -2,7 +2,7 @@ use std::any::TypeId;
 use std::collections::HashSet;
 
 // todo: doc
-#[derive(Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
+#[derive(Clone, Copy, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub struct Dependency {
     id: DependencyId,
     relation: DependencyRelation
@@ -41,7 +41,7 @@ impl DependencyId {
     }
 }
 
-#[derive(Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
+#[derive(Clone, Copy, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub enum DependencyRelation {
     Read,
     Write,

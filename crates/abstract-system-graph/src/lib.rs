@@ -1,10 +1,9 @@
-#![feature(generic_associated_types)] // clion please stop cyberbullying me
-
 pub mod system;
 pub mod node;
 pub mod graph;
 pub mod resource;
 pub mod dependency;
+pub mod tasks;
 
 pub use prelude::*;
 

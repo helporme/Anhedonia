@@ -52,4 +52,3 @@ impl<'a, R: AnyResource> ChannelEstablisher<'a, LockChannel<'a, R>> for AnyStora
         self.request_lock::<R>().map(|lock| LockChannel::new(lock))
     }
 }
-

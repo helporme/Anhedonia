@@ -21,6 +21,7 @@ pub trait ChannelEstablisher<'a, Channel> {
     fn establish(&'a self) -> Option<Channel>;
 }
 
+// todo: write derive macro
 pub trait GetChannelEstablisherRef<'a, Channel> {
     type Output: ChannelEstablisher<'a, Channel>;
 
