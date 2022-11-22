@@ -1,12 +1,10 @@
-mod runner;
+pub mod builder;
 
-use crate::node::NodePacked;
+pub use builder::*;
 
-// todo: doc
-pub trait Graph<'a> {
-    type ExecutionKit;
+pub trait Graph {
+    type Kit;
 
-    fn add_node(&mut self, node: NodePacked<'a, Self::ExecutionKit>);
-
-    fn execute(&mut self);
+    fn execute(&self);
 }
+
