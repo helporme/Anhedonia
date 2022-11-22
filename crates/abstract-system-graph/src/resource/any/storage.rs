@@ -1,8 +1,8 @@
 use std::any::TypeId;
 use std::collections::HashMap;
 
-use crate::any::AnyResource;
-use crate::any::links::AnyRwLock;
+use super::AnyResource;
+use super::links::AnyRwLock;
 
 pub type AnyMap = HashMap<TypeId, AnyRwLock>;
 

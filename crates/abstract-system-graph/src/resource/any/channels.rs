@@ -1,7 +1,8 @@
 use crate::resource::{Channel, ChannelEstablisher};
-use crate::any::{AnyResource, Lock, Mut, Ref};
-use crate::any::links::AnyRwLock;
-use crate::any::storage::AnyStorage;
+
+use super::{AnyResource, Lock, Mut, Ref};
+use super::links::AnyRwLock;
+use super::storage::AnyStorage;
 
 pub struct LockChannel<'a, R: AnyResource> {
     lock: Lock<'a, R>

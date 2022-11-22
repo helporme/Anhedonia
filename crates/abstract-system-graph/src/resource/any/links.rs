@@ -4,8 +4,9 @@ use std::ops::{Deref, DerefMut};
 use std::sync::{RwLock, RwLockReadGuard, RwLockWriteGuard};
 
 use crate::resource::Link;
-use crate::any::AnyResource;
 use crate::dependency::{Dependency, DependencyWriter};
+
+use super::AnyResource;
 
 pub type AnyRwLock = RwLock<Box<dyn Any>>;
 pub type AnyRwReadGuard<'a> = RwLockReadGuard<'a, Box<dyn Any>>;
