@@ -6,41 +6,26 @@ use crate::resource::*;
 
 /// A node that directly calls the system in the main thread with required resources.
 // todo: doc
-pub struct SystemNode<Sys, Chn> {
+pub struct SystemNode<Sys> {
     system: Sys,
-    channel: Option<Chn>,
 }
 
-impl<'a, Sys, Chn, Kit> Node<'a, Kit> for SystemNode<Sys, Chn>
-    where Sys: System + 'a,
-          Chn: Channel<'a, Sys::Input> + 'a,
-          Kit: GetChannelEstablisherMut<'a, Chn> {
+impl<'n, Sys, Kit> Node<Kit> for SystemNode<Sys>
+    where Sys: System + 'n,
+          Kit: LinkerCompound<Sys::Input> + 'n {
 
-    fn configure(&self, kit: &mut Kit) {
-        kit.channel_establisher().configure();
-    }
-
-    fn build(&mut self, kit: &'a Kit) {
-        self.channel = Some(kit.channel_establisher().establish()
-            .expect("System must be configured before initialization."));
-    }
-
-    fn execute(&'a self, _: &Kit) {
-        let channel = self.channel.as_ref()
-            .expect("System must be initialized before execution.");
-
-        if channel.is_alive() {
-            self.system.run(channel.obtain().unwrap());
+    fn execute(&self, linker: &mut Kit) {
+        if linker.can_be_linked() {
+            self.system.run(linker.link().unwrap());
         }
     }
 }
 
-impl<'a, Sys, Chn, Kit> From<SystemNode<Sys, Chn>> for NodePacked<'a, Kit>
-    where Sys: System + 'a,
-          Chn: Channel<'a, Sys::Input> + 'a,
-          Kit: GetChannelEstablisherMut<'a, Chn> {
+impl<'n, Sys, Kit> From<SystemNode<Sys>> for NodePacked<'n, Kit>
+    where Sys: System + 'n,
+          Kit: LinkerCompound<Sys::Input> {
 
-    fn from(node: SystemNode<Sys, Chn>) -> Self {
+    fn from(node: SystemNode<Sys>) -> Self {
         let mut writer = DependencyWriter::default();
         Sys::Input::write_deps(&mut writer);
 
@@ -48,8 +33,8 @@ impl<'a, Sys, Chn, Kit> From<SystemNode<Sys, Chn>> for NodePacked<'a, Kit>
     }
 }
 
-impl<Sys: System, Chn> From<Sys> for SystemNode<Sys, Chn> {
+impl<Sys: System> From<Sys> for SystemNode<Sys> {
     fn from(system: Sys) -> Self {
-        Self { system, channel: None }
+        Self { system }
     }
 }

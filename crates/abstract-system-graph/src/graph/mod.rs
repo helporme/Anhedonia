@@ -7,4 +7,3 @@ pub trait Graph {
 
     fn execute(&self);
 }
-

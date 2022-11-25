@@ -6,8 +6,6 @@ use std::sync::{RwLock, RwLockReadGuard, RwLockWriteGuard};
 use crate::resource::Link;
 use crate::dependency::{Dependency, DependencyWriter};
 
-use super::AnyResource;
-
 pub type AnyRwLock = RwLock<Box<dyn Any>>;
 pub type AnyRwReadGuard<'a> = RwLockReadGuard<'a, Box<dyn Any>>;
 pub type AnyRwWriteGuard<'a> = RwLockWriteGuard<'a, Box<dyn Any>>;
@@ -17,7 +15,7 @@ pub struct Lock<'a, R> {
     _marker: PhantomData<R>
 }
 
-impl<'a, R: AnyResource> Lock<'a, R> {
+impl<'a, R: 'static> Lock<'a, R> {
     pub const fn new(source: &'a AnyRwLock) -> Self {
         Self { source, _marker: PhantomData }
     }
@@ -31,13 +29,13 @@ impl<'a, R: AnyResource> Lock<'a, R> {
     }
 }
 
-impl<'a, R: AnyResource> Link for Lock<'a, R> {
+impl<'a, R: 'static> Link for Lock<'a, R> {
     fn write_deps(writer: &mut DependencyWriter) {
         writer.write(Dependency::write_of::<R>());
     }
 }
 
-impl<'a, R: AnyResource> Clone for Lock<'a, R> {
+impl<'a, R: 'static> Clone for Lock<'a, R> {
     fn clone(&self) -> Self {
         Self { source: self.source, _marker: PhantomData }
     }
@@ -48,19 +46,19 @@ pub struct Ref<'a, R> {
     _marker: PhantomData<R>
 }
 
-impl<'a, R: AnyResource> Ref<'a, R> {
+impl<'a, R: 'static> Ref<'a, R> {
     pub const fn new(source: AnyRwReadGuard<'a>) -> Self {
         Self { source, _marker: PhantomData }
     }
 }
 
-impl<'a, R: AnyResource> Link for Ref<'a, R> {
+impl<'a, R: 'static> Link for Ref<'a, R> {
     fn write_deps(writer: &mut DependencyWriter) {
         writer.write(Dependency::read_of::<R>())
     }
 }
 
-impl<'a, R: AnyResource> Deref for Ref<'a, R> {
+impl<'a, R: 'static> Deref for Ref<'a, R> {
     type Target = R;
 
     fn deref(&self) -> &Self::Target {
@@ -73,19 +71,19 @@ pub struct Mut<'a, R> {
     _marker: PhantomData<R>
 }
 
-impl<'a, R: AnyResource> Mut<'a, R> {
+impl<'a, R: 'static> Mut<'a, R> {
     pub const fn new(source: AnyRwWriteGuard<'a>) -> Self {
         Self { source, _marker: PhantomData }
     }
 }
 
-impl<'a, R: AnyResource> Link for Mut<'a, R> {
+impl<'a, R: 'static> Link for Mut<'a, R> {
     fn write_deps(writer: &mut DependencyWriter) {
         writer.write(Dependency::write_of::<R>())
     }
 }
 
-impl<'a, R: AnyResource> Deref for Mut<'a, R> {
+impl<'a, R: 'static> Deref for Mut<'a, R> {
     type Target = R;
 
     fn deref(&self) -> &Self::Target {
@@ -93,7 +91,7 @@ impl<'a, R: AnyResource> Deref for Mut<'a, R> {
     }
 }
 
-impl<'a, R: AnyResource> DerefMut for Mut<'a, R> {
+impl<'a, R: 'static> DerefMut for Mut<'a, R> {
     fn deref_mut(&mut self) -> &mut Self::Target {
         self.source.downcast_mut::<R>().unwrap()
     }

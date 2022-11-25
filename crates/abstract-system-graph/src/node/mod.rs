@@ -7,19 +7,17 @@ use std::collections::HashSet;
 
 use crate::dependency::Dependency;
 
-pub trait Node<'a, Kit>: 'a {
-    fn configure(&'a self, kit: &mut Kit);
-    fn build(&'a mut self, kit: &'a Kit);
-    fn execute(&'a self, kit: &'a Kit);
+pub trait Node<Kit> {
+    fn execute(&self, kit: &mut Kit);
 }
 
 pub struct NodePacked<'a, Kit> {
-    node: Box<dyn Node<'a, Kit>>,
+    node: Box<dyn Node<Kit> + 'a>,
     dependencies: HashSet<Dependency>,
 }
 
 impl<'a, Kit> NodePacked<'a, Kit> {
-    pub fn new<N: Node<'a, Kit>>(node: N, dependencies: HashSet<Dependency>) -> Self {
+    pub fn new<N: Node<Kit> + 'a>(node: N, dependencies: HashSet<Dependency>) -> Self {
         Self { node: Box::new(node), dependencies }
     }
 

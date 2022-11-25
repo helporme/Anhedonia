@@ -1,13 +1,12 @@
-// todo: doc
-
-pub mod links;
 pub mod storage;
-pub mod channels;
+pub mod links;
 
-pub use links::{Lock, Ref, Mut};
-pub use storage::AnyStorage;
-pub use channels::LockChannel;
+use std::any::{Any, TypeId};
+use std::collections::HashMap;
+use std::sync::{RwLock, RwLockReadGuard, RwLockWriteGuard};
 
-pub trait AnyResource: 'static + Default { }
+type AnyRwLock = RwLock<Box<dyn Any>>;
+type AnyRwReadGuard<'a> = RwLockReadGuard<'a, Box<dyn Any>>;
+type AnyRwWriteGuard<'a> = RwLockWriteGuard<'a, Box<dyn Any>>;
+type AnyMap = HashMap<TypeId, AnyRwLock>;
 
-impl<R: 'static + Default> AnyResource for R { }
