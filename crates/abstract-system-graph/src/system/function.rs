@@ -6,20 +6,6 @@ use macros::impl_with_idents;
 use crate::resource::Link;
 use crate::system::System;
 
-/// A system that is implemented for all functions whose arguments implement [`Link`].
-///
-/// # Examples
-/// ```
-/// use abstract_system_graph::FunctionSystem;
-///
-/// // Ok. Link is implemented for the reference of Resource
-/// fn suitable_system_fn(res: &u8) { }
-///
-/// // Error. u8 isn't a link
-/// fn unsuitable_system_fn(res: u8) { }
-///
-/// let system = FunctionSystem::from(suitable_system_fn);
-/// ```
 pub struct FunctionSystem<Func: SystemFn<In, Out>, In: Link, Out> {
     func: Func,
     _marker: PhantomData<(In, Out)>

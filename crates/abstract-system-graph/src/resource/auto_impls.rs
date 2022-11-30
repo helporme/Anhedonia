@@ -1,8 +1,9 @@
+use std::mem;
 // todo: doc
 use macros::impl_with_idents;
 
 use crate::dependency::DependencyWriter;
-use crate::resource::{Link, Linker, LinkerCompound};
+use crate::resource::{Link, Linker, FiniteLinker};
 
 macro_rules! impl_link_tuple {
     ($($input:ident),+) => {
@@ -23,13 +24,15 @@ macro_rules! impl_link_tuple {
     }
 }
 
-macro_rules! impl_linker_compound {
+macro_rules! impl_finite_linker {
     ($($L:ident),+) => {
-        impl<Compound, $($L),*,> LinkerCompound<($($L),*,)> for Compound
-            where $($L: Link),*, $(Compound: Linker<$L>),* {
+        impl<'_fn, Compound: '_fn, $($L),*,> FiniteLinker<($($L),*,)> for Compound
+            where $($L: Link),*, $(Compound: Linker<'_fn, $L>),* {
 
             fn link(&self) -> Option<($($L),*,)> {
-                if let ($(Some($L)),*,) = ($(Linker::<$L>::link(self)),*,) {
+                let _self: &'_fn Self = unsafe {mem::transmute(self) };
+
+                if let ($(Some($L)),*,) = ($(Linker::<$L>::link(_self)),*,) {
                     Some(($($L),*,))
                 } else {
                     None
@@ -43,7 +46,7 @@ macro_rules! impl_linker_compound {
     };
 
     () => {
-        impl<Compound: Linker<()>> LinkerCompound<()> for Compound {
+        impl<'_fn, Compound: Linker<'_fn, ()>> FiniteLinker<()> for Compound {
             fn link(&self) -> Option<()> {
                 Some(())
             }
@@ -56,4 +59,4 @@ macro_rules! impl_linker_compound {
 }
 
 impl_with_idents!(impl_link_tuple, 0, 16, L);
-impl_with_idents!(impl_linker_compound, 0, 16, L);
+impl_with_idents!(impl_finite_linker, 0, 16, L);

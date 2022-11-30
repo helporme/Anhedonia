@@ -7,8 +7,8 @@ pub trait TaskBarrier {
     fn wait(&self);
 }
 
-pub trait GetTaskBarrierRef {
+pub trait AsTaskBarrier {
     type Output: TaskBarrier;
 
-    fn task_barrier(&self) -> &Self::Output;
+    fn as_ref(&self) -> &Self::Output;
 }

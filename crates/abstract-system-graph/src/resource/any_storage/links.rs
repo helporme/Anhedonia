@@ -20,11 +20,11 @@ impl<'a, R: 'static> Lock<'a, R> {
         Self { source, _marker: PhantomData }
     }
 
-    pub fn read(&self) -> Ref<R> {
+    pub fn read(&'a self) -> Ref<'a, R> {
         Ref::new(self.source.read().unwrap())
     }
 
-    pub fn write(&self) -> Mut<R> {
+    pub fn write(&'a self) -> Mut<'a, R> {
         Mut::new(self.source.write().unwrap())
     }
 }

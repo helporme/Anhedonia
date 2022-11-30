@@ -1,8 +1,8 @@
 use crate::dependency::DependencyWriter;
 
 use crate::system::System;
-use crate::node::*;
-use crate::resource::*;
+use crate::node::{Node, NodePacked};
+use crate::resource::{AsLinker, FiniteLinker, Link};
 
 /// A node that directly calls the system in the main thread with required resources.
 // todo: doc
@@ -12,9 +12,11 @@ pub struct SystemNode<Sys> {
 
 impl<'n, Sys, Kit> Node<Kit> for SystemNode<Sys>
     where Sys: System + 'n,
-          Kit: LinkerCompound<Sys::Input> + 'n {
+          Kit: AsLinker<Sys::Input> + 'n {
 
-    fn execute(&self, linker: &mut Kit) {
+    fn execute(&self, kit: &mut Kit) {
+        let linker = kit.as_ref();
+
         if linker.can_be_linked() {
             self.system.run(linker.link().unwrap());
         }
@@ -23,7 +25,7 @@ impl<'n, Sys, Kit> Node<Kit> for SystemNode<Sys>
 
 impl<'n, Sys, Kit> From<SystemNode<Sys>> for NodePacked<'n, Kit>
     where Sys: System + 'n,
-          Kit: LinkerCompound<Sys::Input> {
+          Kit: AsLinker<Sys::Input> {
 
     fn from(node: SystemNode<Sys>) -> Self {
         let mut writer = DependencyWriter::default();

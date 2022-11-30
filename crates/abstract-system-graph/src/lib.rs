@@ -11,8 +11,7 @@ mod tests {
     use crate::graph::Graph;
     use crate::node::{NodePacked, SystemNode};
     use crate::node::system_unit::SystemUnitNode;
-    use crate::resource::any::links::Lock;
-    use crate::resource::any::storage::{AnyStorage, };
+    use crate::resource::any_storage::{AnyStorage, Lock, Ref};
     use crate::system::FunctionSystem;
 
     struct Giraph;
@@ -41,8 +40,8 @@ mod tests {
 
     pub fn main() {
         let _graph = graph::builder()
-            // .add_node(SystemUnitNode::from(FunctionSystem::from(system)))
-            // .add_node(SystemNode::from(FunctionSystem::from(system2)))
+            .add_node(SystemUnitNode::from(FunctionSystem::from(system)))
+            .add_node(SystemNode::from(FunctionSystem::from(system2)))
             .build::<Giraph>();
     }
 
@@ -50,7 +49,6 @@ mod tests {
 
     }
 
-    pub fn system2(l: Lock<u8>) {
-
+    pub fn system2(l: Lock<u8>, i: Ref<u8>) {
     }
 }
