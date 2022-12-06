@@ -5,5 +5,5 @@ pub use builder::*;
 pub trait Graph {
     type Kit;
 
-    fn execute(&self);
+    fn execute(&mut self);
 }
