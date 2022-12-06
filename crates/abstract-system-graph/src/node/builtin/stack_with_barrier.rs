@@ -19,17 +19,18 @@ impl<'n, Kit: AsTaskBarrier + 'n> Node<Kit> for NodeStackWithBarrier<'n, Kit> {
     }
 }
 
-impl<'n, Kit: 'n> NodeStackWithBarrier<'n, Kit> {
-    pub const fn new(nodes: Vec<NodePacked<'n, Kit>>) -> Self {
-        NodeStackWithBarrier {
+impl<'n, Kit: 'n> From<Vec<NodePacked<'n, Kit>>> for NodeStackWithBarrier<'n, Kit> {
+    fn from(nodes: Vec<NodePacked<'n, Kit>>) -> Self {
+        Self {
             nodes
         }
     }
 }
 
+
 impl<'n, Kit: 'n> Default for NodeStackWithBarrier<'n, Kit> {
     fn default() -> Self {
-        NodeStackWithBarrier::new(Vec::default())
+        NodeStackWithBarrier::from(Vec::default())
     }
 }
 

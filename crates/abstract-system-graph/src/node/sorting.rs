@@ -1,34 +1,36 @@
 use std::collections::HashMap;
 
 use crate::dependency::{DependencyId, DependencyRelation};
-use crate::node::{NodePacked, NodeStack, NodeStackWithBarrier};
-use crate::tasks::AsTaskBarrier;
+use crate::node::NodePacked;
 
 pub type SortResult<T> = Result<T, SortError>;
 
+#[derive(Debug)]
 pub enum SortError {
     CycleDependencies
 }
 
-pub fn sort_as_node_stack_with_barriers<'a, K: AsTaskBarrier + 'a>(
-    nodes: Vec<NodePacked<'a, K>>) -> SortResult<NodeStackWithBarrier<'a, K>> {
+pub fn sort_by_dependencies_flat_with<'a, K, F>(
+    nodes: Vec<NodePacked<'a, K>>, f: F) -> SortResult<NodePacked<'a, K>>
+    where K: 'a, F: Fn(Vec<NodePacked<'a, K>>) -> NodePacked<'a, K> {
 
-    Ok(NodeStackWithBarrier::new(sort_into_parallel_groups(nodes)?
+    Ok(f(sort_by_dependencies(nodes)?
         .drain(..)
-        .map(|nested_nodes| NodeStackWithBarrier::new(nested_nodes).into())
+        .map(|nested_nodes| f(nested_nodes).into())
         .collect::<Vec<NodePacked<'a, K>>>()))
 }
 
-pub fn sort_as_node_stacks<'a, K: 'a>(
-    nodes: Vec<NodePacked<'a, K>>) -> SortResult<NodeStack<'a, K>> {
+pub fn sort_by_dependencies_flat<'a, Kit, Flat>(nodes: Vec<NodePacked<'a, Kit>>) -> SortResult<Flat>
+    where Kit: 'a,
+          Flat: From<Vec<NodePacked<'a, Kit>>> + Into<NodePacked<'a, Kit>>{
 
-    Ok(NodeStack::new(sort_into_parallel_groups(nodes)?
+    Ok(Flat::from(sort_by_dependencies(nodes)?
         .drain(..)
-        .map(|nested_nodes| NodeStack::new(nested_nodes).into())
-        .collect::<Vec<NodePacked<'a, K>>>()))
+        .map(|nested_nodes| Flat::from(nested_nodes).into())
+        .collect::<Vec<NodePacked<'a, Kit>>>()))
 }
 
-pub fn sort_into_parallel_groups<'a, K: 'a>(
+pub fn sort_by_dependencies<'a, K: 'a>(
     mut nodes: Vec<NodePacked<'a, K>>) -> SortResult<Vec<Vec<NodePacked<'a, K>>>> {
 
     let rely_map = into_rely_map(&nodes[..]);
@@ -38,19 +40,19 @@ pub fn sort_into_parallel_groups<'a, K: 'a>(
     let mut node_stacks: Vec<Vec<NodePacked<'a, K>>> = Vec::default();
 
     while nodes_left > 0 {
-        let mut node_stack: Vec<NodePacked<'a, K>> = Vec::default();
-
-        for i in 0..nodes.len() {
-            if rely_map[i]
-                .as_ref()
-                .map_or(false, |node_indices| node_indices
+        let free_node_indices: Vec<usize> = (0..nodes.len())
+            .filter(|&i| {
+                nodes[i].is_some() && rely_map[i]
+                    .as_ref() .map_or(true, |node_indices| node_indices
                     .iter()
-                    .all(|i| nodes[*i].is_none())) {
+                    .all(|i| nodes[*i].is_none())) })
+            .collect();
 
-                nodes_left -= 1;
-                node_stack.push(nodes[i].take().unwrap());
-            }
-        }
+        let node_stack: Vec<NodePacked<'a, K>> = free_node_indices.into_iter()
+            .map(|i| nodes[i].take().unwrap())
+            .collect();
+
+        nodes_left -= node_stack.len();
 
         if node_stack.is_empty() && nodes_left > 0 {
             return Err(SortError::CycleDependencies);
@@ -62,7 +64,7 @@ pub fn sort_into_parallel_groups<'a, K: 'a>(
     Ok(node_stacks)
 }
 
-fn into_rely_map<'a, 'b, K: 'a>(nodes: &[NodePacked<'a, K>]) -> Vec<Option<Vec<usize>>> {
+fn into_rely_map<'a, K: 'a>(nodes: &[NodePacked<'a, K>]) -> Vec<Option<Vec<usize>>> {
     let mut writes_to_dep: HashMap<DependencyId, Vec<usize>> = HashMap::default();
     let mut reads_from_dep: HashMap<DependencyId, Vec<usize>> = HashMap::default();
 
@@ -77,13 +79,13 @@ fn into_rely_map<'a, 'b, K: 'a>(nodes: &[NodePacked<'a, K>]) -> Vec<Option<Vec<u
         }
     }
 
-    let mut rely_map: Vec<Option<Vec<usize>>> = Vec::with_capacity(nodes.len());
+    let mut rely_map: Vec<Option<Vec<usize>>> = vec![None; nodes.len()];
 
-    for (dep_id, node_indices) in reads_from_dep.iter() {
+    for (dep_id, node_indices) in writes_to_dep.iter() {
        for node_idx in node_indices.iter() {
-           if let Some(writers) = writes_to_dep.get(dep_id) {
+           if let Some(readers) = reads_from_dep.get(dep_id) {
                let relies = rely_map[*node_idx].get_or_insert_with(Vec::default);
-               relies.extend(writers);
+               relies.extend(readers);
            }
        }
     }

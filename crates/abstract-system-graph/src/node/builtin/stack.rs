@@ -15,9 +15,9 @@ impl<'n, Kit: 'n> Node<Kit> for NodeStack<'n, Kit> {
     }
 }
 
-impl<'n, Kit: 'n> NodeStack<'n, Kit> {
-    pub const fn new(nodes: Vec<NodePacked<'n, Kit>>) -> Self {
-        NodeStack {
+impl<'n, Kit: 'n> From<Vec<NodePacked<'n, Kit>>> for NodeStack<'n, Kit> {
+    fn from(nodes: Vec<NodePacked<'n, Kit>>) -> Self {
+        Self {
             nodes
         }
     }
@@ -25,7 +25,7 @@ impl<'n, Kit: 'n> NodeStack<'n, Kit> {
 
 impl<'a, Kit: 'a> Default for NodeStack<'a, Kit> {
     fn default() -> Self {
-        NodeStack::new(Vec::default())
+        NodeStack::from(Vec::default())
     }
 }
 
