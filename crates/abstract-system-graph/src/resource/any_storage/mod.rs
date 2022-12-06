@@ -11,18 +11,18 @@ use crate::resource::Linker;
 type AnyRwLock = RwLock<Box<dyn Any>>;
 type AnyMap = HashMap<TypeId, AnyRwLock>;
 
+#[derive(Default)]
 pub struct AnyStorage {
     map: AnyMap
 }
 
 impl AnyStorage {
-    pub fn contains<R: 'static>(&self) -> bool {
-        self.map.contains_key(&TypeId::of::<R>())
+    pub fn new() -> Self {
+        Self::default()
     }
 
-    pub fn get<R: 'static>(&self) -> Option<&R> {
-        self.map.get(&TypeId::of::<R>())
-            .map(|lock| *lock.read().unwrap().downcast_ref().unwrap())
+    pub fn contains<R: 'static>(&self) -> bool {
+        self.map.contains_key(&TypeId::of::<R>())
     }
 
     pub(crate) fn get_lock<R: 'static>(&self) -> Option<&AnyRwLock> {

@@ -10,6 +10,10 @@ pub type AnyRwLock = RwLock<Box<dyn Any>>;
 pub type AnyRwReadGuard<'a> = RwLockReadGuard<'a, Box<dyn Any>>;
 pub type AnyRwWriteGuard<'a> = RwLockWriteGuard<'a, Box<dyn Any>>;
 
+struct AnyStorageDependency<R: 'static> {
+    _marker: PhantomData<R>
+}
+
 pub struct Lock<'a, R> {
     source: &'a AnyRwLock,
     _marker: PhantomData<R>
@@ -31,7 +35,7 @@ impl<'a, R: 'static> Lock<'a, R> {
 
 impl<'a, R: 'static> Link for Lock<'a, R> {
     fn write_deps(writer: &mut DependencyWriter) {
-        writer.write(Dependency::write_of::<R>());
+        writer.write(Dependency::write_of::<AnyStorageDependency<R>>());
     }
 }
 
@@ -54,7 +58,7 @@ impl<'a, R: 'static> Ref<'a, R> {
 
 impl<'a, R: 'static> Link for Ref<'a, R> {
     fn write_deps(writer: &mut DependencyWriter) {
-        writer.write(Dependency::read_of::<R>())
+        writer.write(Dependency::read_of::<AnyStorageDependency<R>>())
     }
 }
 
@@ -79,7 +83,7 @@ impl<'a, R: 'static> Mut<'a, R> {
 
 impl<'a, R: 'static> Link for Mut<'a, R> {
     fn write_deps(writer: &mut DependencyWriter) {
-        writer.write(Dependency::write_of::<R>())
+        writer.write(Dependency::write_of::<AnyStorageDependency<R>>())
     }
 }
 
