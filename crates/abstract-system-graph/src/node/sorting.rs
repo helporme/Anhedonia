@@ -81,14 +81,52 @@ fn into_rely_map<'a, K: 'a>(nodes: &[NodePacked<'a, K>]) -> Vec<Option<Vec<usize
 
     let mut rely_map: Vec<Option<Vec<usize>>> = vec![None; nodes.len()];
 
-    for (dep_id, node_indices) in writes_to_dep.iter() {
+    for (dep_id, node_indices) in reads_from_dep.iter() {
        for node_idx in node_indices.iter() {
-           if let Some(readers) = reads_from_dep.get(dep_id) {
+           if let Some(writers) = writes_to_dep.get(dep_id) {
                let relies = rely_map[*node_idx].get_or_insert_with(Vec::default);
-               relies.extend(readers);
+               relies.extend(writers);
            }
        }
     }
 
     rely_map
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::{node::Node, dependency::Dependency};
+
+    use super::*;
+
+    impl Node<u32> for u32 {
+        fn execute(&self, out: &mut u32) {
+            *out = *self;
+        }
+    }
+
+    #[test]
+    fn proper_sort_by_dependencies() {
+        struct A; struct B;
+
+        let nodes: Vec<NodePacked<u32>> = vec![
+            NodePacked::new(0, [Dependency::read_of::<A>()].into_iter().collect()),
+            NodePacked::new(1, [Dependency::read_of::<B>()].into_iter().collect()),
+            NodePacked::new(2, [Dependency::write_of::<A>(), Dependency::write_of::<B>()].into_iter().collect())
+            ];
+        
+        let sorted = sort_by_dependencies(nodes).unwrap();
+        let mut check_val = 3;
+
+        assert_eq!(sorted.len(), 2);
+        assert_eq!(sorted[0].len(), 1);
+        assert_eq!(sorted[1].len(), 2);
+
+        sorted[0][0].inner_ref().execute(&mut check_val);
+        assert_eq!(check_val, 2);
+        sorted[1][1].inner_ref().execute(&mut check_val);
+        assert!(check_val == 1 || check_val == 0);
+        sorted[1][0].inner_ref().execute(&mut check_val);
+        assert!(check_val == 0 || check_val == 1);
+    }
 }
