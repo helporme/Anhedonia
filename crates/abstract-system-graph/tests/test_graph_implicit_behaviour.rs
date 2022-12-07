@@ -42,27 +42,33 @@ fn correct_sorted_node_exec_order() {
     struct D; struct E; struct F;
     struct I; struct O;
 
-    fn system_0(i: Ref<I>, a: Mut<A>, b: Mut<B>, order: Ref<RwLock<Vec<&'static str>>>) {
+    fn system_0(i: Ref<I>, a: Mut<A>, b: Mut<B>, 
+        order: Ref<RwLock<Vec<&'static str>>>) {
         order.write().unwrap().push("system_0");
     }
 
-    fn system_1(i: Ref<I>, b: Mut<B>, order: Ref<RwLock<Vec<&'static str>>>) {
+    fn system_1(i: Ref<I>, b: Mut<B>,
+        order: Ref<RwLock<Vec<&'static str>>>) {
         order.write().unwrap().push("system_1");
     }
 
-    fn system_2(a: Ref<A>, f: Mut<F>, order: Ref<RwLock<Vec<&'static str>>>) {
+    fn system_2(a: Ref<A>, f: Mut<F>, 
+        order: Ref<RwLock<Vec<&'static str>>>) {
         order.write().unwrap().push("system_2");
     }
 
-    fn system_3(a: Ref<A>, b: Ref<B>, e: Mut<E>, order: Ref<RwLock<Vec<&'static str>>>) {
+    fn system_3(a: Ref<A>, b: Ref<B>, e: Mut<E>, 
+        order: Ref<RwLock<Vec<&'static str>>>) {
         order.write().unwrap().push("system_3");
     }
 
-    fn system_4(b: Ref<B>, d: Mut<D>, order: Ref<RwLock<Vec<&'static str>>>) {
+    fn system_4(b: Ref<B>, d: Mut<D>, 
+        order: Ref<RwLock<Vec<&'static str>>>) {
         order.write().unwrap().push("system_4");
     }
 
-    fn system_5(f: Ref<F>, e: Ref<E>, d: Ref<D>, r: Mut<O>, order: Ref<RwLock<Vec<&'static str>>>) {
+    fn system_5(f: Ref<F>, e: Ref<E>, d: Ref<D>, r: Mut<O>, 
+        order: Ref<RwLock<Vec<&'static str>>>) {
         order.write().unwrap().push("system_5");
     }
 
@@ -92,5 +98,5 @@ fn correct_sorted_node_exec_order() {
         .into_inner()
         .unwrap();
     
-    assert_eq!(order, vec!["system_0", "system_1", "system_2", "system_3", "system_4", "system_5"]);
+    assert_eq!(order, (0..6).map(|i| format!("system_{}", i)).collect::<Vec<_>>());
 }

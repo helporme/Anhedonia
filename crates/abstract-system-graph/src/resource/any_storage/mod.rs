@@ -81,3 +81,23 @@ impl<'_fn, R: 'static, Storage: AsRef<AnyStorage>> Linker<'_fn, Mut<'_fn, R>> fo
         self.as_ref().contains::<R>()
     }
 }
+
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn storage_insert_remove() {
+        use super::*;
+
+        let mut storage = AnyStorage::new();
+
+        assert_eq!(storage.insert(0u32), None);
+        assert_eq!(storage.insert(0u64), None);
+        assert_eq!(storage.insert(0u32), Some(0u32));
+
+        drop(storage.get_lock::<u64>().unwrap().write().unwrap());
+        drop(storage.get_lock::<u64>().unwrap().read().unwrap());
+
+        assert_eq!(storage.remove::<u32>(), Some(0u32));
+        assert_eq!(storage.remove::<u64>(), Some(0u64));
+    }
+}
