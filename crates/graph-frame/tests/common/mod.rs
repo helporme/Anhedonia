@@ -1,7 +1,7 @@
-use abstract_system_graph::graph::Graph;
-use abstract_system_graph::node::{Node, NodeStack, NodePacked};
-use abstract_system_graph::resource::any_storage::AnyStorage;
-use abstract_system_graph::node::sorting::sort_by_dependencies_flat;
+use graph_frame::graph::Graph;
+use graph_frame::node::{Node, NodeStack, NodePacked};
+use graph_frame::resource::any_storage::AnyStorage;
+use graph_frame::node::sorting::sort_by_dependencies_flat;
 
 pub struct TestGraph<'n> {
     pub kit: TestKit,

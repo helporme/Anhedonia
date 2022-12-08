@@ -2,9 +2,9 @@ mod common;
 
 use std::sync::RwLock;
 
-use abstract_system_graph::prelude::*;
-use abstract_system_graph::graph::{Graph, graph_builder};
-use abstract_system_graph::resource::{Mut, Ref, Lock};
+use graph_frame::prelude::*;
+use graph_frame::graph::{Graph, graph_builder};
+use graph_frame::resource::{Mut, Ref, Lock};
 
 use crate::common::TestGraph;
 
