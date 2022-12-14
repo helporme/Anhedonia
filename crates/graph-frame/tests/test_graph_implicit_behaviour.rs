@@ -3,8 +3,7 @@ mod utils;
 
 use std::sync::RwLock;
 use graph_frame::building::*;
-use graph_frame::resource::any_storage::AnyStorage;
-use graph_frame::resource::{Mut, Ref};
+use graph_frame::storages::{AnyStorage, Ref, Mut};
 
 impl_resources!(A, B, C, D, E, F, I, O);
 

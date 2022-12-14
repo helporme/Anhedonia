@@ -6,7 +6,7 @@ use std::any::{Any, TypeId};
 use std::collections::HashMap;
 use std::sync::RwLock;
 
-use crate::resource::Linker;
+use crate::linking::Linker;
 
 type AnyRwLock = RwLock<Box<dyn Any>>;
 type AnyMap = HashMap<TypeId, AnyRwLock>;

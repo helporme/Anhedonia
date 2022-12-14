@@ -2,7 +2,7 @@ pub mod function;
 
 pub use function::{FunctionSystem, SystemFn};
 
-use crate::resource::Link;
+use crate::linking::Link;
 
 pub trait System {
     /// [`Link`] is a way to access a resource (a reference for example).

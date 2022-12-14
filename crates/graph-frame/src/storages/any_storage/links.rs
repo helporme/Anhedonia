@@ -3,7 +3,7 @@ use std::marker::PhantomData;
 use std::ops::{Deref, DerefMut};
 use std::sync::{RwLock, RwLockReadGuard, RwLockWriteGuard};
 
-use crate::resource::Link;
+use crate::linking::Link;
 use crate::dependency::{Dependency, DependencyWriter};
 
 pub type AnyRwLock = RwLock<Box<dyn Any>>;

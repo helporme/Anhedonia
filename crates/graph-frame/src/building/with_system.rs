@@ -1,6 +1,6 @@
 use crate::GraphBuilderNodes;
 use crate::node::SystemNode;
-use crate::resource::{AsLinker, Link};
+use crate::linking::{AsLinker, Link};
 use crate::system::{FunctionSystem, SystemFn};
 
 pub trait GraphBuilderWithSystem<'n, Kit, In: Link> {

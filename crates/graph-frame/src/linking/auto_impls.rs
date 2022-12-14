@@ -3,7 +3,7 @@ use std::mem;
 use macros::impl_with_idents;
 
 use crate::dependency::DependencyWriter;
-use crate::resource::{Link, Linker, FiniteLinker};
+use crate::linking::{Link, Linker, FiniteLinker};
 
 macro_rules! impl_link_tuple {
     ($($input:ident),+) => {

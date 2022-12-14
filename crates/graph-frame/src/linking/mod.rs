@@ -1,7 +1,4 @@
-pub mod any_storage;
 pub mod auto_impls;
-
-pub use any_storage::links::{Lock, Mut, Ref};
 
 use crate::dependency::DependencyWriter;
 

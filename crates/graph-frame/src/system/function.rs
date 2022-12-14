@@ -3,7 +3,7 @@
 use std::marker::PhantomData;
 use macros::impl_with_idents;
 
-use crate::resource::Link;
+use crate::linking::Link;
 use crate::system::System;
 
 pub struct FunctionSystem<Func: SystemFn<In, Out>, In: Link, Out> {
