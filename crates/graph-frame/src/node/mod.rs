@@ -1,4 +1,3 @@
-pub mod sorting;
 pub mod builtin;
 
 pub use builtin::*;

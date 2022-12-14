@@ -1,43 +1,32 @@
 use std::collections::HashMap;
 
-use crate::dependency::{DependencyId, DependencyRelation};
-use crate::node::NodePacked;
+use crate::{dependency::{DependencyId, DependencyRelation}, node::NodePacked};
+use super::{SortResult, SortError, NodeSorter};
 
-pub type SortResult<T> = Result<T, SortError>;
-
-#[derive(Debug)]
-pub enum SortError {
-    CycleDependencies
+pub fn sorter_by_deps_folded<'n, Kit, TFold>() -> impl NodeSorter<'n, Kit>
+    where Kit: 'n,
+          TFold: From<Vec<NodePacked<'n, Kit>>> + Into<NodePacked<'n, Kit>> {
+    
+    sorter_by_deps_folded_with(|nodes| TFold::from(nodes).into())
 }
 
-pub fn sort_by_dependencies_flat_with<'a, K, F>(
-    nodes: Vec<NodePacked<'a, K>>, f: F) -> SortResult<NodePacked<'a, K>>
-    where K: 'a, F: Fn(Vec<NodePacked<'a, K>>) -> NodePacked<'a, K> {
-
-    Ok(f(sort_by_dependencies(nodes)?
-        .drain(..)
-        .map(|nested_nodes| f(nested_nodes).into())
-        .collect::<Vec<NodePacked<'a, K>>>()))
+pub fn sorter_by_deps_folded_with<'n, Kit, FoldFn>(fold_fn: FoldFn) -> impl NodeSorter<'n, Kit>
+    where Kit: 'n, FoldFn: Fn(Vec<NodePacked<'n, Kit>>) -> NodePacked<'n, Kit> {
+    
+    move |nodes: Vec<NodePacked<'n, Kit>>| {
+        Ok(fold_fn(sort_groups_by_deps(nodes)?
+            .into_iter()
+            .map(|nested_nodes| fold_fn(nested_nodes).into())
+            .collect::<Vec<NodePacked<'n, Kit>>>()))
+    }
 }
 
-pub fn sort_by_dependencies_flat<'a, Kit, Flat>(nodes: Vec<NodePacked<'a, Kit>>) -> SortResult<Flat>
-    where Kit: 'a,
-          Flat: From<Vec<NodePacked<'a, Kit>>> + Into<NodePacked<'a, Kit>>{
-
-    Ok(Flat::from(sort_by_dependencies(nodes)?
-        .drain(..)
-        .map(|nested_nodes| Flat::from(nested_nodes).into())
-        .collect::<Vec<NodePacked<'a, Kit>>>()))
-}
-
-pub fn sort_by_dependencies<'a, K: 'a>(
-    mut nodes: Vec<NodePacked<'a, K>>) -> SortResult<Vec<Vec<NodePacked<'a, K>>>> {
-
+pub fn sort_groups_by_deps<'n, Kit: 'n>(nodes: Vec<NodePacked<'n, Kit>>) -> SortResult<Vec<Vec<NodePacked<'n, Kit>>>> {
     let rely_map = into_rely_map(&nodes[..]);
-    let mut nodes = nodes.drain(..).map(Some).collect::<Vec<_>>();
+    let mut nodes = nodes.into_iter().map(Some).collect::<Vec<_>>();
     let mut nodes_left = nodes.len();
 
-    let mut node_stacks: Vec<Vec<NodePacked<'a, K>>> = Vec::default();
+    let mut node_stacks: Vec<Vec<NodePacked<'n, Kit>>> = Vec::default();
 
     while nodes_left > 0 {
         let free_node_indices: Vec<usize> = (0..nodes.len())
@@ -48,7 +37,7 @@ pub fn sort_by_dependencies<'a, K: 'a>(
                     .all(|i| nodes[*i].is_none())) })
             .collect();
 
-        let node_stack: Vec<NodePacked<'a, K>> = free_node_indices.into_iter()
+        let node_stack: Vec<NodePacked<'n, Kit>> = free_node_indices.into_iter()
             .map(|i| nodes[i].take().unwrap())
             .collect();
 
@@ -64,7 +53,7 @@ pub fn sort_by_dependencies<'a, K: 'a>(
     Ok(node_stacks)
 }
 
-fn into_rely_map<'a, K: 'a>(nodes: &[NodePacked<'a, K>]) -> Vec<Option<Vec<usize>>> {
+fn into_rely_map<'n, Kit: 'n>(nodes: &[NodePacked<'n, Kit>]) -> Vec<Option<Vec<usize>>> {
     let mut writes_to_dep: HashMap<DependencyId, Vec<usize>> = HashMap::default();
     let mut reads_from_dep: HashMap<DependencyId, Vec<usize>> = HashMap::default();
 
@@ -115,7 +104,7 @@ mod tests {
             NodePacked::new(2, [Dependency::write_of::<A>(), Dependency::write_of::<B>()].into_iter().collect())
             ];
         
-        let sorted = sort_by_dependencies(nodes).unwrap();
+        let sorted = sort_groups_by_deps(nodes).unwrap();
         let mut check_val = 3;
 
         assert_eq!(sorted.len(), 2);
