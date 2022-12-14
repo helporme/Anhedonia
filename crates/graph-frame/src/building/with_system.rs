@@ -1,5 +1,5 @@
 use crate::GraphBuilderNodes;
-use crate::node::SystemNode;
+use crate::nodes::SystemNode;
 use crate::linking::{AsLinker, Link};
 use crate::system::{FunctionSystem, SystemFn};
 

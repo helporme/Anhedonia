@@ -1,7 +1,7 @@
 use crate::dependency::DependencyWriter;
 
 use crate::system::System;
-use crate::node::{Node, NodePacked};
+use crate::nodes::{Node, NodePacked};
 use crate::linking::{AsLinker, FiniteLinker, Link};
 
 /// A node that directly calls the system in the main thread with required resources.

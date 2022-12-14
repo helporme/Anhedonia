@@ -1,5 +1,5 @@
 use crate::GraphBuilderNodes;
-use crate::node::SystemUnitNode;
+use crate::nodes::SystemUnitNode;
 use crate::system::{FunctionSystem, SystemFn};
 
 pub trait GraphBuilderWithSystemUnit<'n, Kit> {

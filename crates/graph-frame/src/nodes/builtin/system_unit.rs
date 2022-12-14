@@ -1,4 +1,4 @@
-use crate::node::{Node, NodePacked};
+use crate::nodes::{Node, NodePacked};
 use crate::system::System;
 
 pub struct SystemUnitNode<Sys> {

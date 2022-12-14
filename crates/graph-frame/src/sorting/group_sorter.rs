@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use crate::{dependency::{DependencyId, DependencyRelation}, node::NodePacked};
+use crate::{dependency::{DependencyId, DependencyRelation}, nodes::NodePacked};
 use super::{SortResult, SortError, NodeSorter};
 
 pub fn sorter_by_deps_folded<'n, Kit, TFold>() -> impl NodeSorter<'n, Kit>
@@ -84,7 +84,7 @@ fn into_rely_map<'n, Kit: 'n>(nodes: &[NodePacked<'n, Kit>]) -> Vec<Option<Vec<u
 
 #[cfg(test)]
 mod tests {
-    use crate::{node::Node, dependency::Dependency};
+    use crate::{nodes::Node, dependency::Dependency};
 
     use super::*;
 

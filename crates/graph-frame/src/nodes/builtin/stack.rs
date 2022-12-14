@@ -1,25 +1,21 @@
 use std::collections::HashSet;
 
 use crate::dependency::Dependency;
-use crate::node::{Node, NodePacked};
-use crate::tasks::{AsTaskBarrier, TaskBarrier};
+use crate::nodes::{Node, NodePacked};
 
-pub struct NodeStackWithBarrier<'n, K> {
+pub struct NodeStack<'n, K> {
     nodes: Vec<NodePacked<'n, K>>
 }
 
-impl<'n, Kit: AsTaskBarrier + 'n> Node<Kit> for NodeStackWithBarrier<'n, Kit> {
+impl<'n, Kit: 'n> Node<Kit> for NodeStack<'n, Kit> {
     fn execute(&self, kit: &mut Kit) {
         for node in self.nodes.iter() {
             node.inner_ref().execute(kit);
         }
-
-        let task_barrier = kit.as_ref();
-        task_barrier.wait()
     }
 }
 
-impl<'n, Kit: 'n> From<Vec<NodePacked<'n, Kit>>> for NodeStackWithBarrier<'n, Kit> {
+impl<'n, Kit: 'n> From<Vec<NodePacked<'n, Kit>>> for NodeStack<'n, Kit> {
     fn from(nodes: Vec<NodePacked<'n, Kit>>) -> Self {
         Self {
             nodes
@@ -27,15 +23,14 @@ impl<'n, Kit: 'n> From<Vec<NodePacked<'n, Kit>>> for NodeStackWithBarrier<'n, Ki
     }
 }
 
-
-impl<'n, Kit: 'n> Default for NodeStackWithBarrier<'n, Kit> {
+impl<'a, Kit: 'a> Default for NodeStack<'a, Kit> {
     fn default() -> Self {
-        NodeStackWithBarrier::from(Vec::default())
+        NodeStack::from(Vec::default())
     }
 }
 
-impl<'n, Kit: AsTaskBarrier + 'n> From<NodeStackWithBarrier<'n, Kit>> for NodePacked<'n, Kit> {
-    fn from(node_stack: NodeStackWithBarrier<'n, Kit>) -> Self {
+impl<'a, Kit: 'a> From<NodeStack<'a, Kit>> for NodePacked<'a, Kit> {
+    fn from(node_stack: NodeStack<'a, Kit>) -> Self {
         let mut dependencies: HashSet<Dependency> = HashSet::default();
 
         for node in node_stack.nodes.iter() {

@@ -1,4 +1,4 @@
-use crate::{node::NodePacked, GraphBuilderNodes};
+use crate::{nodes::NodePacked, GraphBuilderNodes};
 
 pub trait GraphBuilderWithNode<'n, Kit> {
     fn with_node(self, node: impl Into<NodePacked<'n, Kit>>) -> Self;

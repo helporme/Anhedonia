@@ -2,7 +2,7 @@ pub mod group_sorter;
 
 pub use group_sorter::{sorter_by_deps_folded ,sorter_by_deps_folded_with};
 
-use crate::node::NodePacked;
+use crate::nodes::NodePacked;
 
 pub type SortResult<T> = Result<T, SortError>;
 

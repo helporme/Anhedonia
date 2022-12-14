@@ -6,7 +6,7 @@ pub use with_node::GraphBuilderWithNode;
 pub use with_system::GraphBuilderWithSystem;
 pub use with_system_unit::GraphBuilderWithSystemUnit;
 
-use crate::node::{Node, NodePacked, NodeStack};
+use crate::nodes::{Node, NodePacked, NodeStack};
 
 pub trait GraphBuilderNodes<'n, Kit> {
     fn nodes(&mut self) -> &mut Vec<NodePacked<'n, Kit>>;
