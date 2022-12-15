@@ -1,27 +1,24 @@
 use std::collections::HashMap;
 
-use crate::{dependency::{DependencyId, DependencyRelation}, nodes::NodePacked};
+use crate::{dependency::{DependencyId, DependencyRelation}, nodes::{NodePacked, NodeStack}};
 use super::{SortResult, SortError, NodeSorter};
 
-pub fn sorter_by_deps_folded<'n, Kit, TFold>() -> impl NodeSorter<'n, Kit>
-    where Kit: 'n,
-          TFold: From<Vec<NodePacked<'n, Kit>>> + Into<NodePacked<'n, Kit>> {
-    
-    sorter_by_deps_folded_with(|nodes| TFold::from(nodes).into())
+pub fn stacks_sorter<'n, Kit: 'n>() -> impl NodeSorter<'n, Kit> {
+    fn_stacks_sorter(|nodes| NodeStack::from(nodes).into())
 }
 
-pub fn sorter_by_deps_folded_with<'n, Kit, FoldFn>(fold_fn: FoldFn) -> impl NodeSorter<'n, Kit>
+pub fn fn_stacks_sorter<'n, Kit, FoldFn>(fold_fn: FoldFn) -> impl NodeSorter<'n, Kit>
     where Kit: 'n, FoldFn: Fn(Vec<NodePacked<'n, Kit>>) -> NodePacked<'n, Kit> {
     
     move |nodes: Vec<NodePacked<'n, Kit>>| {
-        Ok(fold_fn(sort_groups_by_deps(nodes)?
+        Ok(fold_fn(sort_by_dependencies(nodes)?
             .into_iter()
             .map(|nested_nodes| fold_fn(nested_nodes).into())
             .collect::<Vec<NodePacked<'n, Kit>>>()))
     }
 }
 
-pub fn sort_groups_by_deps<'n, Kit: 'n>(nodes: Vec<NodePacked<'n, Kit>>) -> SortResult<Vec<Vec<NodePacked<'n, Kit>>>> {
+pub fn sort_by_dependencies<'n, Kit: 'n>(nodes: Vec<NodePacked<'n, Kit>>) -> SortResult<Vec<Vec<NodePacked<'n, Kit>>>> {
     let rely_map = into_rely_map(&nodes[..]);
     let mut nodes = nodes.into_iter().map(Some).collect::<Vec<_>>();
     let mut nodes_left = nodes.len();
@@ -104,7 +101,7 @@ mod tests {
             NodePacked::new(2, [Dependency::write_of::<A>(), Dependency::write_of::<B>()].into_iter().collect())
             ];
         
-        let sorted = sort_groups_by_deps(nodes).unwrap();
+        let sorted = sort_by_dependencies(nodes).unwrap();
         let mut check_val = 3;
 
         assert_eq!(sorted.len(), 2);

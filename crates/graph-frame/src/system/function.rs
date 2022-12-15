@@ -34,7 +34,8 @@ pub trait SystemFn<Input: Link, Output> {
 /// Macro that implements [`SystemFn`] for [`Fn`] trait.
 ///
 /// # Examples
-/// ```
+/// ```ignore
+/// 
 /// // impl_system_fn(L0, L1, L2) will generate the following code:
 ///
 /// #[allow(non_snake_case)]

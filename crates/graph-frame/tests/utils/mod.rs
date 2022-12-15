@@ -19,6 +19,7 @@ macro_rules! build_graph {
         GarphBuilder::new()
             $(.with_system($system))*
             .with_kit(macros::composed!(any_storage: AnyStorage => AnyStorage::new()))
+            .with_sorter(graph_frame::sorting::stacks_sorter())
             .build()
     };
 }
