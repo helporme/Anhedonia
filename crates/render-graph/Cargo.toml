@@ -1,0 +1,12 @@
+[package]
+name = "render-graph"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+macros = { path = "../macros" }
+graph-frame = { path = "../graph-frame" }
+wgpu = "0.13"
+pollster = "0.2"
+image = "0.24"
+bytemuck = { version = "1.4", features = [ "derive" ]}
