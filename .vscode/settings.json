@@ -1,0 +1,8 @@
+{
+    "rust-analyzer.linkedProjects": [
+        "/workspaces/Anhedonia/crates/graph-frame/Cargo.toml",
+        "/workspaces/Anhedonia/crates/render-graph/Cargo.toml",
+        "/workspaces/Anhedonia/crates/macros/Cargo.toml",
+        "/workspaces/Anhedonia/crates/render/Cargo.toml",
+    ],
+}
